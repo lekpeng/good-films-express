@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const movieRouter = require("./routers/movie_routes");
 const reviewRouter = require("./routers/review_routes");
 const userRouter = require("./routers/user_routes");
+const seeding = require("./seeds/seeding");
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -34,3 +35,6 @@ app.listen(port, async () => {
 
   console.log(`Good films backend listening on port ${port}`);
 });
+
+// Seeds
+app.get("/api/v1/seed", seeding);

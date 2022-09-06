@@ -3,11 +3,11 @@ const Schema = mongoose.Schema;
 
 const movieSchema = new Schema({
   movieApiId: {
-    type: String,
+    type: Number,
     required: true,
     unique: true,
   },
-  
+
   averageRating: {
     type: Number,
     default: 0,
