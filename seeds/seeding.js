@@ -67,8 +67,28 @@ const seedReviews = async () => {
   );
 
   await reviewModel.insertMany(data);
+
   console.log("seeded reviews and linked");
 };
+
+const updateAverageRatings = async () => {
+  const movies = await movieModel.find({}).populate("reviewIds")
+  const moviesWithUpdatedAverage = await Promise.all(movies.map(async (movie) => {
+    const ratings = movie.reviewIds.map(review => review.rating).filter(Boolean)
+    let averageRating = 0
+    if (ratings.length){
+      averageRating = ratings.reduce((a,b) => a+b)/ratings.length
+    } 
+
+    await movie.updateOne({"$set": {
+        "averageRating": averageRating,
+      }
+    })
+    return
+
+  }))
+}
+
 
 const seed = async (req, res) => {
   const firstUsername = userData[0].username;
@@ -78,10 +98,17 @@ const seed = async (req, res) => {
     await seedUsers();
     await seedMovies();
     await seedReviews();
+    await updateAverageRatings()
     res.send("seeded!");
     return;
   }
   res.send("already seeded previously!");
+
+
+
 };
+
+
+
 
 module.exports = seed;
