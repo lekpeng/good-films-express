@@ -6,7 +6,7 @@ module.exports = {
   showMovie: async (req, res) => {
     try {
       const response = await axios.get(
-        `https://api.themoviedb.org/3/movie/${req.params.movieId}?api_key=${process.env.API_KEY}`
+        `https://api.themoviedb.org/3/movie/${req.params.movieApiId}?api_key=${process.env.API_KEY}`
       );
       const data = await response.data;
       console.log(data);
