@@ -11,9 +11,17 @@ module.exports = {
 
     // might need to add validation for username? which one are we using as unique identifier?
     try {
-      const user = await userModel.findOne({ email: validatedValues.email });
+      const user = await userModel.findOne({
+        username: validatedValues.username,
+      });
       if (user) {
         return res.status(409).json({ error: "user exists" });
+      }
+      const email = await userModel.findOne({ email: validatedValues.email });
+      if (email) {
+        return res
+          .status(409)
+          .json({ error: "email already registered, please use another" });
       }
     } catch (err) {
       return res.status(500).json({ error: "failed to get user" });
@@ -68,5 +76,9 @@ module.exports = {
     );
 
     return res.json({ token });
+  },
+
+  authExample: async (req, res) => {
+    res.send("authorised");
   },
 };
