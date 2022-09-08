@@ -13,8 +13,7 @@ const seedUsers = async () => {
   const data = await Promise.all(
     userData.map(async (user) => {
       const hashedPassword = await bcrypt.hash(user.password, 10);
-      user.hash = hashedPassword;
-      delete user.password;
+      user.password = hashedPassword;
       return user;
     })
   );
@@ -72,23 +71,24 @@ const seedReviews = async () => {
 };
 
 const updateAverageRatings = async () => {
-  const movies = await movieModel.find({}).populate("reviewIds")
-  const moviesWithUpdatedAverage = await Promise.all(movies.map(async (movie) => {
-    const ratings = movie.reviewIds.map(review => review.rating).filter(Boolean)
-    let averageRating = 0
-    if (ratings.length){
-      averageRating = ratings.reduce((a,b) => a+b)/ratings.length
-    } 
-
-    await movie.updateOne({"$set": {
-        "averageRating": averageRating,
+  const movies = await movieModel.find({}).populate("reviewIds");
+  const moviesWithUpdatedAverage = await Promise.all(
+    movies.map(async (movie) => {
+      const ratings = movie.reviewIds.map((review) => review.rating).filter(Boolean);
+      let averageRating = 0;
+      if (ratings.length) {
+        averageRating = ratings.reduce((a, b) => a + b) / ratings.length;
       }
+
+      await movie.updateOne({
+        $set: {
+          averageRating: averageRating,
+        },
+      });
+      return;
     })
-    return
-
-  }))
-}
-
+  );
+};
 
 const seed = async (req, res) => {
   const firstUsername = userData[0].username;
@@ -98,17 +98,11 @@ const seed = async (req, res) => {
     await seedUsers();
     await seedMovies();
     await seedReviews();
-    await updateAverageRatings()
+    await updateAverageRatings();
     res.send("seeded!");
     return;
   }
   res.send("already seeded previously!");
-
-
-
 };
-
-
-
 
 module.exports = seed;
