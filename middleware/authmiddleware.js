@@ -24,11 +24,12 @@ module.exports = (req, res, next) => {
     });
   }
 
-  // TODO: set global var userAuth if JWT is valid
+  // checking if token is signed by same secret and setting token info into global variable
   const verified = jwt.verify(token, process.env.JWT_SECRET);
 
   if (verified) {
     res.locals.userAuth = verified;
+    // console.log("verified: ", res.locals.userAuth);
     next();
     return;
   }

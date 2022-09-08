@@ -9,7 +9,7 @@ module.exports = {
     const validatedValues = req.body;
     console.log("req.body: ", req.body);
 
-    // might need to add validation for username? which one are we using as unique identifier?
+    // checks for unique email and username
     try {
       const user = await userModel.findOne({
         username: validatedValues.username,
@@ -27,9 +27,11 @@ module.exports = {
       return res.status(500).json({ error: "failed to get user" });
     }
 
+    // hashing password and putting req object into user variable
     const passHash = await bcrypt.hash(req.body.password, 10);
     const user = { ...req.body, password: passHash };
 
+    // creating user in db
     try {
       await userModel.create(user);
     } catch (err) {
@@ -47,6 +49,7 @@ module.exports = {
     let errMsg = "username or password is incorrect";
     let user = null;
 
+    // checking if username submitted is present in db
     try {
       user = await userModel.findOne({ username: validatedValues.username });
       if (!user) {
@@ -56,6 +59,7 @@ module.exports = {
       return res.status(500).json({ error: "failed to get user" });
     }
 
+    // checking if password matches
     const isPasswordOk = await bcrypt.compare(req.body.password, user.password);
 
     if (!isPasswordOk) {
@@ -65,7 +69,7 @@ module.exports = {
     // generate JWT and return as response
     const userData = {
       email: user.email,
-      name: user.name,
+      username: user.username,
     };
     const token = jwt.sign(
       {
@@ -78,7 +82,8 @@ module.exports = {
     return res.json({ token });
   },
 
+  // example route for BE route authorization via JWT
   authExample: async (req, res) => {
-    res.send("authorised");
+    res.json(res.locals.userAuth);
   },
 };
