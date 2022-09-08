@@ -18,13 +18,25 @@ module.exports = {
     }
   },
 
-  showTrending: async (req, res) => {
+  showPopular: async (req, res) => {
     try {
       const response = await axios.get(
-        `https://api.themoviedb.org/3/trending/all/day?api_key=${process.env.API_KEY}`
+        `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.API_KEY}`
       );
       const data = await response.data;
-      console.log(data.results);
+      res.json(data.results);
+    } catch (error) {
+      res.status(404);
+      return res.json({ error: `Failed to get movie` });
+    }
+  },
+
+  showTopRated: async (req, res) => {
+    try {
+      const response = await axios.get(
+        `https://api.themoviedb.org/3/movie/top_rated?api_key=${process.env.API_KEY}`
+      );
+      const data = await response.data;
       res.json(data.results);
     } catch (error) {
       res.status(404);
