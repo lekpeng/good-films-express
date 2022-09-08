@@ -1,13 +1,20 @@
 const bcrypt = require("bcrypt");
 const userModel = require("../models/user");
 const jwt = require("jsonwebtoken");
+const userValidators = require("./validator_controller");
 
 module.exports = {
   register: async (req, res) => {
-    // do validations ...
+    // validations
+    const formData = userValidators.registerValidator.validate(req.body);
 
-    const validatedValues = req.body;
-    console.log("req.body: ", req.body);
+    if (formData.error) {
+      console.log("error: ", formData.error.message);
+      return res.status(409).json({ error: formData.error.message });
+    }
+
+    const validatedValues = formData.value;
+    console.log("validated values: ", validatedValues);
 
     // checks for unique email and username
     try {
