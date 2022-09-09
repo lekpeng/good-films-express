@@ -14,9 +14,6 @@ const movies = [
   {
     movieApiId: 675,
   },
-  {
-    movieApiId: 767,
-  },
 ];
 
 module.exports = movies;

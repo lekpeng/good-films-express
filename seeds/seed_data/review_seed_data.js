@@ -10,7 +10,7 @@ const reviews = [
   },
 
   {
-    reviewText: "everyone knows who the half-blood prince is 🙄",
+    reviewText: "someone give me a time turner for xmas please",
   },
 
   {
