@@ -6,5 +6,6 @@ const router = express.Router();
 router.get("/:movieApiId", movieController.showMovie);
 router.get("/popular", movieController.showPopular);
 router.get("/top_rated", movieController.showTopRated);
+router.get("/:genre/:genreId", movieController.filterByGenre);
 
 module.exports = router;
