@@ -20,6 +20,11 @@ module.exports = {
         })
         .lean()
         .exec();
+
+      if (!profileUser) {
+        res.status(404);
+        return res.json({ error: `User ${profileUsername} does not exist!` });
+      }
       const reviews = await Promise.all(
         profileUser.reviewIds.map(async (review) => {
           try {
@@ -33,6 +38,32 @@ module.exports = {
           }
           return review;
         })
+      );
+
+      const profile = {
+        username: profileUser.username,
+        reviews: reviews,
+        isCurrentUser: profileUsername === currentUserUsername,
+      };
+      res.json(profile);
+      return;
+    } catch (err) {
+      res.status(500);
+      return res.json({ error: `Fail to get profile of username ${profileUsername} ` });
+    }
+  },
+
+  updateFollowing: async (req, res) => {
+    const follower = req.params.follower;
+    const followee = req.params.followee;
+    try {
+      const followeeUser = await User.findOne({ username: followee });
+
+      await User.findOneAndUpdate(
+        { username: follower },
+        {
+          $push: { followingIds: followeeUser._id },
+        }
       );
 
       const profile = {
