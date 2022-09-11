@@ -35,8 +35,7 @@ module.exports = {
             const data = await response.data;
             review.movieTitle = data.title;
           } catch (error) {
-            review.movieTitle =
-              "This movie title is not available for some reason.";
+            review.movieTitle = "This movie title is not available for some reason.";
           }
           return review;
         })
@@ -52,13 +51,7 @@ module.exports = {
       return;
     } catch (err) {
       res.status(500);
-<<<<<<< HEAD
       return res.json({ error: `Failed to get profile of username ${profileUsername} ` });
-=======
-      return res.json({
-        error: `Fail to get profile of username ${profileUsername} `,
-      });
->>>>>>> master
     }
   },
 
