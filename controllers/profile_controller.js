@@ -55,13 +55,16 @@ module.exports = {
     }
   },
 
-  addFollowing: async (req, res) => {
-    console.log("BACKEND add following");
-    const followee = req.params.followee;
+  updateFollowing: async (req, res) => {
+    const followee = req.body.followee;
     const currentUserAuthDetails = res.locals.userAuth;
     const follower = currentUserAuthDetails.data.username;
 
     try {
+      if (followee === follower) {
+        res.status(400);
+        return res.json({ error: `You cannot follow yourself!` });
+      }
       const followeeUser = await User.findOne({ username: followee });
 
       if (!followeeUser) {
@@ -69,13 +72,24 @@ module.exports = {
         return res.json({ error: `Username ${followee} does not exist!` });
       }
 
-      const followerUser = await User.findOneAndUpdate(
-        { username: follower },
-        {
-          $push: { followingIds: followeeUser._id },
-        },
-        { new: true }
-      );
+      let followerUser;
+      if (req.url === "/follow") {
+        followerUser = await User.findOneAndUpdate(
+          { username: follower },
+          {
+            $addToSet: { followingIds: followeeUser._id },
+          },
+          { new: true }
+        );
+      } else {
+        followerUser = await User.findOneAndUpdate(
+          { username: follower },
+          {
+            $pull: { followingIds: followeeUser._id },
+          },
+          { new: true }
+        );
+      }
 
       if (!followerUser) {
         res.status(404);
@@ -90,38 +104,38 @@ module.exports = {
     }
   },
 
-  removeFollowing: async (req, res) => {
-    console.log("BACKEND remove following");
-    const followee = req.params.followee;
-    const currentUserAuthDetails = res.locals.userAuth;
-    const follower = currentUserAuthDetails.data.username;
+  // removeFollowing: async (req, res) => {
+  //   console.log("BACKEND remove following");
+  //   const followee = req.body.followee;
+  //   const currentUserAuthDetails = res.locals.userAuth;
+  //   const follower = currentUserAuthDetails.data.username;
 
-    try {
-      const followeeUser = await User.findOne({ username: followee });
+  //   try {
+  //     const followeeUser = await User.findOne({ username: followee });
 
-      if (!followeeUser) {
-        res.status(404);
-        return res.json({ error: `Username ${followee} does not exist!` });
-      }
+  //     if (!followeeUser) {
+  //       res.status(404);
+  //       return res.json({ error: `Username ${followee} does not exist!` });
+  //     }
 
-      const followerUser = await User.findOneAndUpdate(
-        { username: follower },
-        {
-          $pull: { followingIds: followeeUser._id },
-        },
-        { new: true }
-      );
+  //     const followerUser = await User.findOneAndUpdate(
+  //       { username: follower },
+  //       {
+  //         $pull: { followingIds: followeeUser._id },
+  //       },
+  //       { new: true }
+  //     );
 
-      if (!followerUser) {
-        res.status(404);
-        return res.json({ error: `Username ${follower} does not exist!` });
-      }
+  //     if (!followerUser) {
+  //       res.status(404);
+  //       return res.json({ error: `Username ${follower} does not exist!` });
+  //     }
 
-      res.json(followerUser);
-      return;
-    } catch (err) {
-      res.status(500);
-      return res.json({ error: `Failed to allow ${follower} to unfollow ${followee}` });
-    }
-  },
+  //     res.json(followerUser);
+  //     return;
+  //   } catch (err) {
+  //     res.status(500);
+  //     return res.json({ error: `Failed to allow ${follower} to unfollow ${followee}` });
+  //   }
+  // },
 };
