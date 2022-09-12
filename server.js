@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const movieRouter = require("./routers/movie_routes");
 const reviewRouter = require("./routers/review_routes");
 const userRouter = require("./routers/user_routes");
+const profileRouter = require("./routers/profile_routes");
 const seeding = require("./seeds/seeding");
 
 const app = express();
@@ -24,6 +25,7 @@ app.use(
 app.use("/api/v1/movies", movieRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/profiles", profileRouter);
 
 app.listen(port, async () => {
   try {
