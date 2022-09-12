@@ -3,6 +3,17 @@ const cors = require("cors");
 const User = require("../models/user");
 
 module.exports = {
+  indexProfiles: async (req, res) => {
+    try {
+      const profileUsers = await User.find({});
+
+      return res.json(profileUsers);
+    } catch (err) {
+      res.status(500);
+      console.log(err);
+      return res.json({ error: `${err}. Failed to get users` });
+    }
+  },
   showProfile: async (req, res) => {
     const profileUsername = req.params.username;
     const currentUserAuthDetails = res.locals.userAuth;
@@ -34,7 +45,7 @@ module.exports = {
             );
             const data = await response.data;
             review.movieTitle = data.title;
-          } catch (error) {
+          } catch (err) {
             review.movieTitle = "This movie title is not available for some reason.";
           }
           return review;
@@ -47,11 +58,10 @@ module.exports = {
         reviews: reviews,
         isCurrentUser: profileUsername === currentUserUsername,
       };
-      res.json(profile);
-      return;
+      return res.json(profile);
     } catch (err) {
       res.status(500);
-      return res.json({ error: `Failed to get profile of username ${profileUsername} ` });
+      return res.json({ error: `${err}. Failed to get profile of username ${profileUsername} ` });
     }
   },
 

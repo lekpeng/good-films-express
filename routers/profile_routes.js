@@ -8,6 +8,7 @@ router.patch("/follow", authMiddleWare, profileController.updateFollowing);
 router.patch("/unfollow", authMiddleWare, profileController.updateFollowing);
 
 // PROFILES
+router.get("/", authMiddleWare, profileController.indexProfiles);
 router.get("/:username", authMiddleWare, profileController.showProfile);
 
 module.exports = router;
