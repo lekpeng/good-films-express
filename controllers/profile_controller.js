@@ -9,9 +9,7 @@ module.exports = {
 
       return res.json(profileUsers);
     } catch (err) {
-      res.status(500);
-      console.log(err);
-      return res.json({ error: `${err}. Failed to get users` });
+      return res.status(500).json({ error: `${err}. Failed to get users` });
     }
   },
   showProfile: async (req, res) => {
@@ -34,8 +32,7 @@ module.exports = {
         .exec();
 
       if (!profileUser) {
-        res.status(404);
-        return res.json({ error: `User ${profileUsername} does not exist!` });
+        return res.status(404).json({ error: `User ${profileUsername} does not exist!` });
       }
       const reviews = await Promise.all(
         profileUser.reviewIds.map(async (review) => {
@@ -60,8 +57,9 @@ module.exports = {
       };
       return res.json(profile);
     } catch (err) {
-      res.status(500);
-      return res.json({ error: `${err}. Failed to get profile of username ${profileUsername} ` });
+      return res
+        .status(500)
+        .json({ error: `${err}. Failed to get profile of username ${profileUsername} ` });
     }
   },
 
@@ -72,14 +70,12 @@ module.exports = {
 
     try {
       if (followee === follower) {
-        res.status(400);
-        return res.json({ error: `You cannot follow yourself!` });
+        return res.status(400).json({ error: `You cannot follow yourself!` });
       }
       const followeeUser = await User.findOne({ username: followee });
 
       if (!followeeUser) {
-        res.status(404);
-        return res.json({ error: `Username ${followee} does not exist!` });
+        return res.status(404).json({ error: `Username ${followee} does not exist!` });
       }
 
       let followerUser;
@@ -102,50 +98,13 @@ module.exports = {
       }
 
       if (!followerUser) {
-        res.status(404);
-        return res.json({ error: `Username ${follower} does not exist!` });
+        return res.status(404).json({ error: `Username ${follower} does not exist!` });
       }
 
       res.json(followerUser);
       return;
     } catch (err) {
-      res.status(500);
-      return res.json({ error: `Failed to allow ${follower} to follow ${followee}` });
+      return res.status(500).json({ error: `Failed to allow ${follower} to follow ${followee}` });
     }
   },
-
-  // removeFollowing: async (req, res) => {
-  //   console.log("BACKEND remove following");
-  //   const followee = req.body.followee;
-  //   const currentUserAuthDetails = res.locals.userAuth;
-  //   const follower = currentUserAuthDetails.data.username;
-
-  //   try {
-  //     const followeeUser = await User.findOne({ username: followee });
-
-  //     if (!followeeUser) {
-  //       res.status(404);
-  //       return res.json({ error: `Username ${followee} does not exist!` });
-  //     }
-
-  //     const followerUser = await User.findOneAndUpdate(
-  //       { username: follower },
-  //       {
-  //         $pull: { followingIds: followeeUser._id },
-  //       },
-  //       { new: true }
-  //     );
-
-  //     if (!followerUser) {
-  //       res.status(404);
-  //       return res.json({ error: `Username ${follower} does not exist!` });
-  //     }
-
-  //     res.json(followerUser);
-  //     return;
-  //   } catch (err) {
-  //     res.status(500);
-  //     return res.json({ error: `Failed to allow ${follower} to unfollow ${followee}` });
-  //   }
-  // },
 };

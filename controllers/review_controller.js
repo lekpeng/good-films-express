@@ -14,8 +14,7 @@ module.exports = {
     const user = await User.findOne({ username: currentUserUsername });
 
     if (!user) {
-      res.status(404);
-      return res.json({ error: `User ${currentUserUsername} does not exist!` });
+      return res.status(404).json({ error: `User ${currentUserUsername} does not exist!` });
     } else {
       try {
         await User.findOneAndUpdate(user.reviewIds, {
@@ -26,7 +25,7 @@ module.exports = {
         });
       } catch (error) {
         console.log(error);
-        res.status(400).send("Failed to rate movie");
+        return res.status(400).json({ error: "Failed to rate movie" });
       }
     }
   },

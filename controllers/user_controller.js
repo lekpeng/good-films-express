@@ -61,7 +61,7 @@ module.exports = {
         return res.status(401).json({ error: errMsg });
       }
     } catch (err) {
-      return res.status(500).json({ error: "failed to get user" });
+      return res.status(500).json({ error: "Failed to get user" });
     }
 
     // checking if password matches
