@@ -29,4 +29,45 @@ module.exports = {
       }
     }
   },
+
+  updateLikes: async (req, res) => {
+    const reviewId = req.body.reviewId;
+    const currentUserAuthDetails = res.locals.userAuth;
+    const currentUserUsername = currentUserAuthDetails.data.username;
+
+    const currentUser = await User.findOne({ username: currentUserUsername });
+
+    if (!currentUser) {
+      return res.status(404).json({ error: `Username ${currentUserUsername} does not exist!` });
+    }
+
+    try {
+      let review;
+      if (req.url === "/like") {
+        review = await Review.findOneAndUpdate(
+          { _id: reviewId },
+          {
+            $addToSet: { userIdsWhoLiked: currentUser._id },
+          },
+          { new: true }
+        );
+      } else {
+        review = await Review.findOneAndUpdate(
+          { _id: reviewId },
+          {
+            $pull: { userIdsWhoLiked: currentUser._id },
+          },
+          { new: true }
+        );
+      }
+
+      if (!review) {
+        return res.status(404).json({ error: `Review Id ${reviewId} does not exist!` });
+      }
+    } catch (err) {
+      return res.status(500).json({
+        error: `Failed to update ${currentUserUsername}'s like status of review with Id ${reviewId}`,
+      });
+    }
+  },
 };

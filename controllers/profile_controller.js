@@ -101,10 +101,11 @@ module.exports = {
         return res.status(404).json({ error: `Username ${follower} does not exist!` });
       }
 
-      res.json(followerUser);
-      return;
+      return res.json(followerUser);
     } catch (err) {
-      return res.status(500).json({ error: `Failed to allow ${follower} to follow ${followee}` });
+      return res
+        .status(500)
+        .json({ error: `Failed to update ${follower}'s following status of ${followee}` });
     }
   },
 };
