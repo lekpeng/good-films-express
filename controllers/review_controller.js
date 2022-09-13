@@ -53,7 +53,8 @@ module.exports = {
 
     try {
       let review;
-      if (req.url === "/like") {
+      const type = req.url.split("/")[2];
+      if (type === "like") {
         review = await Review.findOneAndUpdate(
           { _id: reviewId },
           {

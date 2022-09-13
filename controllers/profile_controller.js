@@ -79,7 +79,9 @@ module.exports = {
       }
 
       let followerUser;
-      if (req.url === "/follow") {
+      const type = req.url.split("/")[2];
+
+      if (type === "follow") {
         followerUser = await User.findOneAndUpdate(
           { username: follower },
           {
