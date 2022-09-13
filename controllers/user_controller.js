@@ -26,9 +26,7 @@ module.exports = {
       }
       const email = await userModel.findOne({ email: validatedValues.email });
       if (email) {
-        return res
-          .status(409)
-          .json({ error: "email already registered, please use another" });
+        return res.status(409).json({ error: "email already registered, please use another" });
       }
     } catch (err) {
       return res.status(500).json({ error: "failed to get user" });
@@ -43,7 +41,7 @@ module.exports = {
       await userModel.create(user);
     } catch (err) {
       console.log(err);
-      return res.status(500).json({ error: "failed to register user" });
+      return res.status(500).json({ error: "Failed to register user" });
     }
 
     return res.status(200).json("User successfully created");
@@ -63,7 +61,7 @@ module.exports = {
         return res.status(401).json({ error: errMsg });
       }
     } catch (err) {
-      return res.status(500).json({ error: "failed to get user" });
+      return res.status(500).json({ error: "Failed to get user" });
     }
 
     // checking if password matches
@@ -80,7 +78,7 @@ module.exports = {
     };
     const token = jwt.sign(
       {
-        exp: Math.floor(Date.now() / 1000) + 60 * 60,
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 5,
         data: userData,
       },
       process.env.JWT_SECRET
