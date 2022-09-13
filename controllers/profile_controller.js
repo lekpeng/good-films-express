@@ -18,41 +18,42 @@ module.exports = {
     const currentUserUsername = currentUserAuthDetails.data.username;
 
     try {
+      // check which populates can be removed
       const profileUser = await User.findOne({ username: profileUsername })
-        .populate({
-          path: "reviewIds",
-          populate: [
-            { path: "movieId" },
-            { path: "userIdsWhoLiked" },
-            // { path: "commentIds", populate: "authorUserId" },
-          ],
-        })
+        .populate("reviewIds")
+        // .populate({
+        //   path: "reviewIds",
+        //   populate: [
+        //     { path: "movieId" },
+        //     { path: "userIdsWhoLiked" },
+        //     { path: "commentIds", populate: "authorUserId" },
+        //   ],
+        // })
         .populate("followingIds")
-        .lean()
         .exec();
 
       if (!profileUser) {
         return res.status(404).json({ error: `User ${profileUsername} does not exist!` });
       }
-      const reviews = await Promise.all(
-        profileUser.reviewIds.map(async (review) => {
-          try {
-            const response = await axios.get(
-              `https://api.themoviedb.org/3/movie/${review.movieId.movieApiId}?api_key=${process.env.API_KEY}`
-            );
-            const data = await response.data;
-            review.movieTitle = data.title;
-          } catch (err) {
-            review.movieTitle = "This movie title is not available for some reason.";
-          }
-          return review;
-        })
-      );
+      // const reviews = await Promise.all(
+      //   profileUser.reviewIds.map(async (review) => {
+      //     try {
+      //       const response = await axios.get(
+      //         `https://api.themoviedb.org/3/movie/${review.movieId.movieApiId}?api_key=${process.env.API_KEY}`
+      //       );
+      //       const data = await response.data;
+      //       review.movieTitle = data.title;
+      //     } catch (err) {
+      //       review.movieTitle = "This movie title is not available for some reason.";
+      //     }
+      //     return review;
+      //   })
+      // );
 
       const profile = {
         username: profileUser.username,
         followees: profileUser.followingIds.map((followingId) => followingId.username),
-        reviews: reviews,
+        reviews: profileUser.reviewIds,
         isCurrentUser: profileUsername === currentUserUsername,
       };
       return res.json(profile);
@@ -79,7 +80,9 @@ module.exports = {
       }
 
       let followerUser;
-      if (req.url === "/follow") {
+      const type = req.url.split("/")[2];
+
+      if (type === "follow") {
         followerUser = await User.findOneAndUpdate(
           { username: follower },
           {
