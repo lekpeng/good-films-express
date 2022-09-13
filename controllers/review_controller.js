@@ -2,6 +2,7 @@ const axios = require("axios");
 const cors = require("cors");
 const Review = require("../models/review");
 const User = require("../models/user");
+const Comment = require("../models/comment");
 
 module.exports = {
   submitRating: async (req, res) => {
@@ -77,9 +78,48 @@ module.exports = {
           .status(404)
           .json({ error: `Review Id ${reviewId} does not exist!` });
       }
+
+      return review;
     } catch (err) {
       return res.status(500).json({
         error: `Failed to update ${currentUserUsername}'s like status of review with Id ${reviewId}`,
+      });
+    }
+  },
+  createComment: async (req, res) => {
+    const commentText = req.body.commentText;
+    const reviewId = req.params.reviewId;
+    const currentUserAuthDetails = res.locals.userAuth;
+    const currentUserUsername = currentUserAuthDetails.data.username;
+
+    const currentUser = await User.findOne({ username: currentUserUsername });
+
+    if (!currentUser) {
+      return res.status(404).json({ error: `Username ${currentUserUsername} does not exist!` });
+    }
+
+    try {
+      const review = await Review.findById(reviewId);
+
+      if (!review) {
+        return res.status(404).json({ error: `Review with Id ${reviewId} does not exist!` });
+      }
+      const comment = await Comment.create({
+        authorUserId: currentUser._id,
+        commentText,
+      });
+
+      const updatedReview = review.updateOne(
+        {
+          $addToSet: { commentIds: comment._id },
+        },
+        { new: true }
+      );
+
+      return updatedReview;
+    } catch (err) {
+      return res.status(500).json({
+        error: `Failed to post comment`,
       });
     }
   },

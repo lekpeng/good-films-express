@@ -24,7 +24,7 @@ module.exports = {
           populate: [
             { path: "movieId" },
             { path: "userIdsWhoLiked" },
-            // { path: "commentIds", populate: "authorUserId" },
+            { path: "commentIds", populate: "authorUserId" },
           ],
         })
         .populate("followingIds")
