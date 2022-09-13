@@ -8,26 +8,34 @@ module.exports = {
     const currentUserAuthDetails = res.locals.userAuth;
     const currentUserUsername = currentUserAuthDetails.data.username;
     const movieApiId = req.params.movieApiId;
-    const userRating = req.body;
+    const userRating = req.body.rating;
 
-    // find user
-    const user = await User.findOne({ username: currentUserUsername });
-
-    if (!user) {
-      return res.status(404).json({ error: `User ${currentUserUsername} does not exist!` });
-    } else {
-      try {
-        await User.findOneAndUpdate(user.reviewIds, {
+    try {
+      // find user
+      const user = await User.findOneAndUpdate(
+        { username: currentUserUsername },
+        {
           $push: {
-            movieId: movieApiId,
-            rating: userRating,
+            reviewIds: {
+              movieId: movieApiId,
+              rating: userRating,
+            },
           },
-        });
-      } catch (error) {
-        console.log(error);
-        return res.status(400).json({ error: "Failed to rate movie" });
+        }
+      );
+
+      if (!user) {
+        res.status(404);
+        return res.json({ error: `User ${user} does not exist!` });
       }
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({ error: "Failed to rate movie" });
     }
+
+    console.log("Rating:", userRating.rating);
+    console.log("User:", user);
+    console.log("Current User Name:", currentUserUsername);
   },
 
   updateLikes: async (req, res) => {
@@ -38,7 +46,9 @@ module.exports = {
     const currentUser = await User.findOne({ username: currentUserUsername });
 
     if (!currentUser) {
-      return res.status(404).json({ error: `Username ${currentUserUsername} does not exist!` });
+      return res
+        .status(404)
+        .json({ error: `Username ${currentUserUsername} does not exist!` });
     }
 
     try {
@@ -62,7 +72,9 @@ module.exports = {
       }
 
       if (!review) {
-        return res.status(404).json({ error: `Review Id ${reviewId} does not exist!` });
+        return res
+          .status(404)
+          .json({ error: `Review Id ${reviewId} does not exist!` });
       }
     } catch (err) {
       return res.status(500).json({
