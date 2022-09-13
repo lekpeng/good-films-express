@@ -136,15 +136,17 @@ module.exports = {
         commentText,
       });
 
-      const updatedReview = review.updateOne(
+      const updatedReview = await Review.findOneAndUpdate(
+        { reviewId },
         {
           $addToSet: { commentIds: comment._id },
         },
         { new: true }
-      );
+      ).populate({ path: "commentIds", populate: "authorUserId" });
 
       return res.json(updatedReview);
     } catch (err) {
+      console.log("err creating comment", err);
       return res.status(500).json({
         error: `Failed to post comment`,
       });
