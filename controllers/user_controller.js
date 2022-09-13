@@ -78,7 +78,7 @@ module.exports = {
     };
     const token = jwt.sign(
       {
-        exp: Math.floor(Date.now() / 1000) + 60 * 60,
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 5,
         data: userData,
       },
       process.env.JWT_SECRET
