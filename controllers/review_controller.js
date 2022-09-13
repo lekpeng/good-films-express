@@ -8,26 +8,32 @@ module.exports = {
     const currentUserAuthDetails = res.locals.userAuth;
     const currentUserUsername = currentUserAuthDetails.data.username;
     const movieApiId = req.params.movieApiId;
-    const userRating = req.body;
+    const userRating = req.body.rating;
 
-    // find user
-    const user = await User.findOne({ username: currentUserUsername });
-
-    if (!user) {
-      res.status(404);
-      return res.json({ error: `User ${currentUserUsername} does not exist!` });
-    } else {
-      try {
-        await User.findOneAndUpdate(user.reviewIds, {
+    try {
+      // find user
+      const user = await User.findOneAndUpdate(
+        { username: currentUserUsername },
+        {
           $push: {
-            movieId: movieApiId,
-            rating: userRating,
+            reviewIds: {
+              movieId: movieApiId,
+              rating: userRating,
+            },
           },
-        });
-      } catch (error) {
-        console.log(error);
-        res.status(400).send("Failed to rate movie");
+        }
+      );
+
+      if (!user) {
+        res.status(404);
+        return res.json({ error: `User ${user} does not exist!` });
       }
+    } catch (err) {
+      res.status(500);
+      return res.json({ error: "Failed to rate movie" });
     }
+    console.log("Rating:", userRating.rating);
+    console.log("User:", user);
+    console.log("Current User Name:", currentUserUsername);
   },
 };
