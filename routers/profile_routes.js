@@ -4,11 +4,11 @@ const authMiddleWare = require("../middleware/authmiddleware");
 const router = express.Router();
 
 // FOLLOW
-router.patch("/follow", authMiddleWare, profileController.updateFollowing);
-router.patch("/unfollow", authMiddleWare, profileController.updateFollowing);
+router.patch("/:username/follow", authMiddleWare, profileController.updateFollowing);
+router.patch("/:username/unfollow", authMiddleWare, profileController.updateFollowing);
 
 // PROFILES
-router.get("/", authMiddleWare, profileController.indexProfiles);
+router.get("/", profileController.indexProfiles);
 router.get("/:username", authMiddleWare, profileController.showProfile);
 
 module.exports = router;
