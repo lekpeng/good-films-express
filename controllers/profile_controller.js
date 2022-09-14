@@ -43,7 +43,9 @@ module.exports = {
   },
 
   updateFollowing: async (req, res) => {
-    const followee = req.body.followee;
+    console.log("UPDATE following");
+
+    const followee = req.params.username;
     const currentUserAuthDetails = res.locals.userAuth;
     const follower = currentUserAuthDetails.data.username;
 
@@ -67,7 +69,9 @@ module.exports = {
             $addToSet: { followingIds: followeeUser._id },
           },
           { new: true }
-        );
+        )
+          .populate("followingIds")
+          .exec();
       } else {
         followerUser = await User.findOneAndUpdate(
           { username: follower },
@@ -75,14 +79,23 @@ module.exports = {
             $pull: { followingIds: followeeUser._id },
           },
           { new: true }
-        );
+        )
+          .populate("followingIds")
+          .exec();
       }
 
       if (!followerUser) {
         return res.status(404).json({ error: `Username ${follower} does not exist!` });
       }
 
-      return res.json(followerUser);
+      const updatedProfile = {
+        username: followerUser.username,
+        followees: followerUser.followingIds.map((followingId) => followingId.username),
+        reviews: followerUser.reviewIds,
+        isCurrentUser: true,
+      };
+
+      return res.json(updatedProfile);
     } catch (err) {
       return res
         .status(500)

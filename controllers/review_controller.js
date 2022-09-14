@@ -65,9 +65,12 @@ module.exports = {
   },
 
   updateLikes: async (req, res) => {
-    const reviewId = req.body.reviewId;
+    const reviewId = req.params.reviewId;
     const currentUserAuthDetails = res.locals.userAuth;
     const currentUserUsername = currentUserAuthDetails.data.username;
+    console.log("reviewId", reviewId);
+    console.log("currentUserAuthDetails", currentUserAuthDetails);
+    console.log("currentUserUsername", currentUserUsername);
 
     const currentUser = await User.findOne({ username: currentUserUsername });
 
@@ -78,6 +81,7 @@ module.exports = {
     try {
       let review;
       const type = req.url.split("/")[2];
+      console.log("type", type);
       if (type === "like") {
         review = await Review.findOneAndUpdate(
           { _id: reviewId },
@@ -86,6 +90,7 @@ module.exports = {
           },
           { new: true }
         ).populate("userIdsWhoLiked");
+        console.log("review", review);
       } else {
         review = await Review.findOneAndUpdate(
           { _id: reviewId },
