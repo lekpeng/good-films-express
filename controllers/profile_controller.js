@@ -21,34 +21,12 @@ module.exports = {
       // check which populates can be removed
       const profileUser = await User.findOne({ username: profileUsername })
         .populate("reviewIds")
-        // .populate({
-        //   path: "reviewIds",
-        //   populate: [
-        //     { path: "movieId" },
-        //     { path: "userIdsWhoLiked" },
-        //     { path: "commentIds", populate: "authorUserId" },
-        //   ],
-        // })
         .populate("followingIds")
         .exec();
 
       if (!profileUser) {
         return res.status(404).json({ error: `User ${profileUsername} does not exist!` });
       }
-      // const reviews = await Promise.all(
-      //   profileUser.reviewIds.map(async (review) => {
-      //     try {
-      //       const response = await axios.get(
-      //         `https://api.themoviedb.org/3/movie/${review.movieId.movieApiId}?api_key=${process.env.API_KEY}`
-      //       );
-      //       const data = await response.data;
-      //       review.movieTitle = data.title;
-      //     } catch (err) {
-      //       review.movieTitle = "This movie title is not available for some reason.";
-      //     }
-      //     return review;
-      //   })
-      // );
 
       const profile = {
         username: profileUser.username,
@@ -65,7 +43,9 @@ module.exports = {
   },
 
   updateFollowing: async (req, res) => {
-    const followee = req.body.followee;
+    console.log("UPDATE following");
+
+    const followee = req.params.username;
     const currentUserAuthDetails = res.locals.userAuth;
     const follower = currentUserAuthDetails.data.username;
 
@@ -89,7 +69,9 @@ module.exports = {
             $addToSet: { followingIds: followeeUser._id },
           },
           { new: true }
-        );
+        )
+          .populate("followingIds")
+          .exec();
       } else {
         followerUser = await User.findOneAndUpdate(
           { username: follower },
@@ -97,14 +79,23 @@ module.exports = {
             $pull: { followingIds: followeeUser._id },
           },
           { new: true }
-        );
+        )
+          .populate("followingIds")
+          .exec();
       }
 
       if (!followerUser) {
         return res.status(404).json({ error: `Username ${follower} does not exist!` });
       }
 
-      return res.json(followerUser);
+      const updatedProfile = {
+        username: followerUser.username,
+        followees: followerUser.followingIds.map((followingId) => followingId.username),
+        reviews: followerUser.reviewIds,
+        isCurrentUser: true,
+      };
+
+      return res.json(updatedProfile);
     } catch (err) {
       return res
         .status(500)
