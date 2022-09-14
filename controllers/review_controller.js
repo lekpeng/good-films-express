@@ -131,7 +131,7 @@ module.exports = {
       });
 
       const updatedReview = await Review.findOneAndUpdate(
-        { reviewId },
+        { _id: reviewId },
         {
           $addToSet: { commentIds: comment._id },
         },
