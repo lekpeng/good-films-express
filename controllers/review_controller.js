@@ -4,6 +4,7 @@ const Review = require("../models/review");
 const User = require("../models/user");
 const Movie = require("../models/movie");
 const Comment = require("../models/comment");
+const Movie = require("../models/movie");
 
 module.exports = {
   showReview: async (req, res) => {
@@ -16,9 +17,7 @@ module.exports = {
       .lean();
 
     if (!review) {
-      return res
-        .status(404)
-        .json({ error: `Review with ID ${reviewId} does not exist!` });
+      return res.status(404).json({ error: `Review with ID ${reviewId} does not exist!` });
     }
 
     try {
@@ -33,6 +32,7 @@ module.exports = {
 
     return res.json(review);
   },
+
   submitRating: async (req, res) => {
     const currentUserAuthDetails = res.locals.userAuth;
     const currentUserUsername = currentUserAuthDetails.data.username;
@@ -92,20 +92,50 @@ module.exports = {
   //   console.log("Current User Name:", currentUserUsername);
   // },
 
+  deleteReview: async (req, res) => {
+    const reviewId = req.params.reviewId;
+    const currentUserAuthDetails = res.locals.userAuth;
+    const currentUserUsername = currentUserAuthDetails.data.username;
+    const currentUser = await User.findOne({ username: currentUserUsername });
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ error: `Review with ID ${reviewId} does not exist` });
+    }
+
+    if (review.authorUserId.toString() !== currentUser._id.toString()) {
+      return res.status(401).json({ error: "You are not authorized to delete this review" });
+    }
+
+    // pull reviewId from User and Movie
+    await currentUser.updateOne({
+      $pull: { reviewIds: review._id },
+    });
+    await Movie.findOneAndUpdate(
+      { _id: review.movieId },
+      {
+        $pull: { reviewIds: review._id },
+      }
+    );
+
+    // delete Comments on that review
+    await Promise.all(
+      review.commentIds.map(async (commentId) => {
+        await Comment.findByIdAndDelete(commentId);
+      })
+    );
+
+    // delete Review itself
+    await review.deleteOne();
+    return res.json();
+  },
   updateLikes: async (req, res) => {
     const reviewId = req.params.reviewId;
     const currentUserAuthDetails = res.locals.userAuth;
     const currentUserUsername = currentUserAuthDetails.data.username;
-    console.log("reviewId", reviewId);
-    console.log("currentUserAuthDetails", currentUserAuthDetails);
-    console.log("currentUserUsername", currentUserUsername);
-
     const currentUser = await User.findOne({ username: currentUserUsername });
 
     if (!currentUser) {
-      return res
-        .status(404)
-        .json({ error: `Username ${currentUserUsername} does not exist!` });
+      return res.status(404).json({ error: `Username ${currentUserUsername} does not exist!` });
     }
 
     try {
@@ -132,9 +162,7 @@ module.exports = {
       }
 
       if (!review) {
-        return res
-          .status(404)
-          .json({ error: `Review Id ${reviewId} does not exist!` });
+        return res.status(404).json({ error: `Review Id ${reviewId} does not exist!` });
       }
 
       return res.json(review);
@@ -153,18 +181,14 @@ module.exports = {
     const currentUser = await User.findOne({ username: currentUserUsername });
 
     if (!currentUser) {
-      return res
-        .status(404)
-        .json({ error: `Username ${currentUserUsername} does not exist!` });
+      return res.status(404).json({ error: `Username ${currentUserUsername} does not exist!` });
     }
 
     try {
       const review = await Review.findById(reviewId);
 
       if (!review) {
-        return res
-          .status(404)
-          .json({ error: `Review with Id ${reviewId} does not exist!` });
+        return res.status(404).json({ error: `Review with Id ${reviewId} does not exist!` });
       }
       const comment = await Comment.create({
         authorUserId: currentUser._id,

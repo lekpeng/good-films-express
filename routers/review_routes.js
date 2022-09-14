@@ -3,16 +3,14 @@ const reviewController = require("../controllers/review_controller");
 const authMiddleWare = require("../middleware/authmiddleware");
 const router = express.Router();
 
+// Reviews
+router.get("/:reviewId", authMiddleWare, reviewController.showReview);
 router.post("/:movieApiId", authMiddleWare, reviewController.submitRating);
-router.patch("/like", authMiddleWare, reviewController.updateLikes);
-router.patch("/unlike", authMiddleWare, reviewController.updateLikes);
+router.delete("/:reviewId/", authMiddleWare, reviewController.deleteReview);
+
+// Actions on reviews
 router.patch("/:reviewId/like", authMiddleWare, reviewController.updateLikes);
 router.patch("/:reviewId/unlike", authMiddleWare, reviewController.updateLikes);
-router.post(
-  "/:reviewId/comments",
-  authMiddleWare,
-  reviewController.createComment
-);
-router.get("/:reviewId", authMiddleWare, reviewController.showReview);
+router.post("/:reviewId/comments", authMiddleWare, reviewController.createComment);
 
 module.exports = router;
