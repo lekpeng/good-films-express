@@ -1,12 +1,12 @@
 const reviews = [
   {
     reviewText: "harry is cute",
-    rating: 1,
+    rating: 7,
   },
 
   {
     reviewText: "brilliant!!!",
-    rating: 5,
+    rating: 10,
   },
 
   {
@@ -15,24 +15,24 @@ const reviews = [
 
   {
     reviewText: "i miss snape",
-    reting: 5,
+    reting: 10,
   },
 
   {
-    rating: 3,
+    rating: 6,
   },
 
   {
     reviewText: "better than LOTR i guess",
-    rating: 4,
+    rating: 8,
   },
 
   {
-    rating: 2,
+    rating: 5,
   },
 
   {
-    rating: 3,
+    rating: 9,
   },
 
   {

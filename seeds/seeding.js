@@ -54,12 +54,14 @@ const seedReviews = async () => {
 
       // 3) assign and push that review to a user
       const usernameAssigned = usernames[idx % numUsers];
-      await userModel.findOneAndUpdate(
+      const user = await userModel.findOneAndUpdate(
         { username: usernameAssigned },
         {
           $push: { reviewIds: review._id },
         }
       );
+
+      review.authorUserId = user._id;
 
       return review;
     })
