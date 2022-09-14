@@ -8,6 +8,7 @@ module.exports = {
   showReview: async (req, res) => {
     const reviewId = req.params.reviewId;
     const review = await Review.findById(reviewId)
+      .populate("authorUserId")
       .populate("userIdsWhoLiked")
       .populate("movieId")
       .populate({ path: "commentIds", populate: "authorUserId" })
@@ -26,13 +27,6 @@ module.exports = {
     } catch (err) {
       review.movieTitle = "This movie title is not available for some reason.";
     }
-
-    // const modifiedReview = {
-    //   movie: review.movieId,
-    //   movieTitle: review.movieTitle,
-    //   usernamesWhoLiked: review.userIdsWhoLiked.map((user) => user.username),
-    //   comments: review.commentIds.map((comment) => )
-    // };
 
     return res.json(review);
   },

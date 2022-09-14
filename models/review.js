@@ -9,6 +9,12 @@ const reviewSchema = new Schema(
       required: true,
     },
 
+    authorUserId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
     userIdsWhoLiked: [
       {
         type: Schema.Types.ObjectId,
