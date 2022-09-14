@@ -5,7 +5,7 @@ const router = express.Router();
 
 // Reviews
 router.get("/:reviewId", authMiddleWare, reviewController.showReview);
-router.post("/rating", reviewController.submitRating); // maybe name this createReview instead
+router.post("/:movieApiId", authMiddleWare, reviewController.submitRating);
 router.delete("/:reviewId/", authMiddleWare, reviewController.deleteReview);
 
 // Actions on reviews
