@@ -3,6 +3,19 @@ const cors = require("cors");
 const Movie = require("../models/movie");
 
 module.exports = {
+  searchMovies: async (req, res) => {
+    try {
+      const response = await axios.get(
+        `https://api.themoviedb.org/3/search/movie?api_key=${process.env.API_KEY}&query=${req.params.query}`
+      );
+      const data = response.data.results.map((movie) => {
+        return { movieApiId: movie.id, movieTitle: movie.title, movieImage: movie.poster_path };
+      });
+      return res.json(data);
+    } catch (err) {
+      return res.status(500).json({ error: `${err}. Failed to get movie` });
+    }
+  },
   showMovie: async (req, res) => {
     try {
       const response = await axios.get(
@@ -52,7 +65,6 @@ module.exports = {
     } catch (error) {
       res.status(404);
       return res.json({ error: `Failed to get list of genres` });
-      console.log(error);
     }
   },
 
