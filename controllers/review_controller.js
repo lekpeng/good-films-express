@@ -4,6 +4,7 @@ const Review = require("../models/review");
 const User = require("../models/user");
 const Movie = require("../models/movie");
 const Comment = require("../models/comment");
+const { text } = require("express");
 
 module.exports = {
   showReview: async (req, res) => {
@@ -31,6 +32,7 @@ module.exports = {
       review.movieTitle = "This movie title is not available for some reason.";
     }
 
+    console.log("review sent: " + JSON.stringify(review));
     return res.json(review);
   },
 
@@ -124,6 +126,20 @@ module.exports = {
     await review.deleteOne();
     return res.json();
   },
+
+  updateReview: async (req, res) => {
+    const updatedReview = await Review.findOneAndUpdate(
+      { _id: req.params.reviewId },
+      {
+        reviewText: req.body.review,
+        rating: req.body.rating,
+      },
+      { upsert: true }
+    ); // add validations
+    console.log("reviewText: " + req.body.reviewText);
+    return res.json("updated!");
+  },
+
   updateLikes: async (req, res) => {
     const reviewId = req.params.reviewId;
     const currentUserAuthDetails = res.locals.userAuth;
