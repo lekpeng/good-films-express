@@ -3,20 +3,8 @@ const cors = require("cors");
 const Movie = require("../models/movie");
 
 module.exports = {
-  searchMovies: async (req, res) => {
-    try {
-      const response = await axios.get(
-        `https://api.themoviedb.org/3/search/movie?api_key=${process.env.API_KEY}&query=${req.params.query}`
-      );
-      const data = response.data.results.map((movie) => {
-        return { movieApiId: movie.id, movieTitle: movie.title, movieImage: movie.poster_path };
-      });
-      return res.json(data);
-    } catch (err) {
-      return res.status(500).json({ error: `${err}. Failed to get movie` });
-    }
-  },
   showMovie: async (req, res) => {
+    console.log("running show movie");
     try {
       const response = await axios.get(
         `https://api.themoviedb.org/3/movie/${req.params.movieApiId}?api_key=${process.env.API_KEY}`
@@ -30,6 +18,7 @@ module.exports = {
   },
 
   showPopular: async (req, res) => {
+    console.log("running popular");
     try {
       const response = await axios.get(
         `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.API_KEY}`
@@ -43,6 +32,7 @@ module.exports = {
   },
 
   showTopRated: async (req, res) => {
+    console.log("running top rated");
     try {
       const response = await axios.get(
         `https://api.themoviedb.org/3/movie/top_rated?api_key=${process.env.API_KEY}`
@@ -65,6 +55,7 @@ module.exports = {
     } catch (error) {
       res.status(404);
       return res.json({ error: `Failed to get list of genres` });
+      console.log(error);
     }
   },
 
@@ -78,6 +69,19 @@ module.exports = {
     } catch (error) {
       res.status(404);
       return res.json({ error: `Failed to get movie` });
+    }
+  },
+  searchMovies: async (req, res) => {
+    try {
+      const response = await axios.get(
+        `https://api.themoviedb.org/3/search/movie?api_key=${process.env.API_KEY}&query=${req.params.query}`
+      );
+      const data = response.data.results.map((movie) => {
+        return { movieApiId: movie.id, movieTitle: movie.title, movieImage: movie.poster_path };
+      });
+      return res.json(data);
+    } catch (err) {
+      return res.status(500).json({ error: `${err}. Failed to get movie` });
     }
   },
 };
