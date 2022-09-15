@@ -4,7 +4,6 @@ const Review = require("../models/review");
 const User = require("../models/user");
 const Movie = require("../models/movie");
 const Comment = require("../models/comment");
-const Movie = require("../models/movie");
 
 module.exports = {
   showReview: async (req, res) => {
@@ -17,7 +16,9 @@ module.exports = {
       .lean();
 
     if (!review) {
-      return res.status(404).json({ error: `Review with ID ${reviewId} does not exist!` });
+      return res
+        .status(404)
+        .json({ error: `Review with ID ${reviewId} does not exist!` });
     }
 
     try {
@@ -33,64 +34,55 @@ module.exports = {
     return res.json(review);
   },
 
-  submitRating: async (req, res) => {
+  createReview: async (req, res) => {
     const currentUserAuthDetails = res.locals.userAuth;
     const currentUserUsername = currentUserAuthDetails.data.username;
-    const movieReviewed = req.params.movieApiId;
+    const movieReviewedId = req.params.movieApiId;
     const userRating = req.body.rating;
     const userReview = req.body.review.text;
 
-    const movieExists = await Movie.findOne({ movieApiId: movieReviewed });
-    console.log("Movie:", movieExists);
+    const currentUser = await User.findOne({ username: currentUserUsername });
+    const movieExists = await Movie.findOne({
+      movieApiId: movieReviewedId,
+    });
+    console.log("Current User", currentUser);
+    console.log("Movie", movieExists);
 
-    // check if movieId exists in DB
+    // Functio to create new review document and tag it to Movie and User
+    tagReview = async (newMovie) => {
+      const newReview = await Review.create({
+        movieId: newMovie._id,
+        authorUserId: currentUser._id,
+        reviewText: userReview,
+        rating: userRating,
+      });
 
-    // if doesn't exist, create a new movie doc
+      console.log("new review:", newReview);
 
-    if (!movieExists) {
-      try {
-        await Movie.create({
-          movieApiId: movieReviewed,
-          reviewIds: {
-            movieId: movieReviewed,
-            reviewText: userReview,
-            rating: userRating,
-          },
-        });
-      } catch (error) {
-        console.log(error);
-        return res.status(400).json({ error: "Unable to create movie review" });
-      }
+      await Movie.findOneAndUpdate(
+        { _id: newMovie._id },
+        {
+          $push: { reviewIds: newReview._id },
+        }
+      ),
+        await User.findOneAndUpdate(
+          { _id: currentUser._id },
+          {
+            $push: { reviewIds: newReview._id },
+          }
+        );
+    };
+
+    // Check if movie exists
+    if (movieExists === null) {
+      const newMovie = await Movie.create({ movieApiId: movieReviewedId });
+      tagReview(newMovie);
+      console.log("movie:", newMovie);
+    } else {
+      const newMovie = await Movie.findOne({ movieApiId: movieReviewedId });
+      tagReview(newMovie);
     }
   },
-
-  //   try {
-  //     // find user
-  //     const user = await User.findOneAndUpdate(
-  //       { username: currentUserUsername },
-  //       {
-  //         $push: {
-  //           reviewIds: {
-  //             movieId: movieApiId,
-  //             rating: userRating,
-  //           },
-  //         },
-  //       }
-  //     );
-
-  //     if (!user) {
-  //       res.status(404);
-  //       return res.json({ error: `User ${user} does not exist!` });
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     return res.status(400).json({ error: "Failed to rate movie" });
-  //   }
-
-  //   console.log("Rating:", userRating.rating);
-  //   console.log("User:", user);
-  //   console.log("Current User Name:", currentUserUsername);
-  // },
 
   deleteReview: async (req, res) => {
     const reviewId = req.params.reviewId;
@@ -99,11 +91,15 @@ module.exports = {
     const currentUser = await User.findOne({ username: currentUserUsername });
     const review = await Review.findById(reviewId);
     if (!review) {
-      return res.status(404).json({ error: `Review with ID ${reviewId} does not exist` });
+      return res
+        .status(404)
+        .json({ error: `Review with ID ${reviewId} does not exist` });
     }
 
     if (review.authorUserId.toString() !== currentUser._id.toString()) {
-      return res.status(401).json({ error: "You are not authorized to delete this review" });
+      return res
+        .status(401)
+        .json({ error: "You are not authorized to delete this review" });
     }
 
     // pull reviewId from User and Movie
@@ -135,7 +131,9 @@ module.exports = {
     const currentUser = await User.findOne({ username: currentUserUsername });
 
     if (!currentUser) {
-      return res.status(404).json({ error: `Username ${currentUserUsername} does not exist!` });
+      return res
+        .status(404)
+        .json({ error: `Username ${currentUserUsername} does not exist!` });
     }
 
     try {
@@ -162,7 +160,9 @@ module.exports = {
       }
 
       if (!review) {
-        return res.status(404).json({ error: `Review Id ${reviewId} does not exist!` });
+        return res
+          .status(404)
+          .json({ error: `Review Id ${reviewId} does not exist!` });
       }
 
       return res.json(review);
@@ -181,14 +181,18 @@ module.exports = {
     const currentUser = await User.findOne({ username: currentUserUsername });
 
     if (!currentUser) {
-      return res.status(404).json({ error: `Username ${currentUserUsername} does not exist!` });
+      return res
+        .status(404)
+        .json({ error: `Username ${currentUserUsername} does not exist!` });
     }
 
     try {
       const review = await Review.findById(reviewId);
 
       if (!review) {
-        return res.status(404).json({ error: `Review with Id ${reviewId} does not exist!` });
+        return res
+          .status(404)
+          .json({ error: `Review with Id ${reviewId} does not exist!` });
       }
       const comment = await Comment.create({
         authorUserId: currentUser._id,
