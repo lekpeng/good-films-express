@@ -7,8 +7,6 @@ const authMiddleWare = require("../middleware/authmiddleware");
 // GET MOVIE DETAILS
 router.get("/listofgenres", movieController.listOfGenres);
 router.get("/:movieApiId", movieController.showMovie);
-router.get("/popular", movieController.showPopular);
-router.get("/top_rated", movieController.showTopRated);
 router.get("/:genre/:genreId", movieController.filterByGenre);
 
 module.exports = router;
