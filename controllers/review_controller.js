@@ -131,7 +131,7 @@ module.exports = {
     const updatedReview = await Review.findOneAndUpdate(
       { _id: req.params.reviewId },
       {
-        reviewText: req.body.review,
+        reviewText: req.body.review.text,
         rating: req.body.rating,
       },
       { upsert: true }
