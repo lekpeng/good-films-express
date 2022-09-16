@@ -8,9 +8,6 @@ const authMiddleWare = require("../middleware/authmiddleware");
 router.get("/listofgenres", movieController.listOfGenres);
 router.get("/:movieApiId", movieController.showMovie);
 
-// router.get("/popular", movieController.showPopular);
-// router.get("/top_rated", movieController.showTopRated);
-
 // Index movies
 router.get("/search/:query", movieController.searchMovies);
 router.get("/:genre/:genreId", movieController.filterByGenre);
