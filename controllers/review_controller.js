@@ -4,6 +4,7 @@ const Review = require("../models/review");
 const User = require("../models/user");
 const Movie = require("../models/movie");
 const Comment = require("../models/comment");
+const { text } = require("express");
 
 module.exports = {
   showReview: async (req, res) => {
@@ -16,9 +17,7 @@ module.exports = {
       .lean();
 
     if (!review) {
-      return res
-        .status(404)
-        .json({ error: `Review with ID ${reviewId} does not exist!` });
+      return res.status(404).json({ error: `Review with ID ${reviewId} does not exist!` });
     }
 
     try {
@@ -31,6 +30,7 @@ module.exports = {
       review.movieTitle = "This movie title is not available for some reason.";
     }
 
+    console.log("review sent: " + JSON.stringify(review));
     return res.json(review);
   },
 
@@ -48,8 +48,8 @@ module.exports = {
     console.log("Current User", currentUser);
     console.log("Movie", movieExists);
 
-    // Functio to create new review document and tag it to Movie and User
-    tagReview = async (newMovie) => {
+    // Function to create new review document and tag it to Movie and User
+    const tagReview = async (newMovie) => {
       const newReview = await Review.create({
         movieId: newMovie._id,
         authorUserId: currentUser._id,
@@ -91,15 +91,11 @@ module.exports = {
     const currentUser = await User.findOne({ username: currentUserUsername });
     const review = await Review.findById(reviewId);
     if (!review) {
-      return res
-        .status(404)
-        .json({ error: `Review with ID ${reviewId} does not exist` });
+      return res.status(404).json({ error: `Review with ID ${reviewId} does not exist` });
     }
 
     if (review.authorUserId.toString() !== currentUser._id.toString()) {
-      return res
-        .status(401)
-        .json({ error: "You are not authorized to delete this review" });
+      return res.status(401).json({ error: "You are not authorized to delete this review" });
     }
 
     // pull reviewId from User and Movie
@@ -124,6 +120,20 @@ module.exports = {
     await review.deleteOne();
     return res.json();
   },
+
+  updateReview: async (req, res) => {
+    const updatedReview = await Review.findOneAndUpdate(
+      { _id: req.params.reviewId },
+      {
+        reviewText: req.body.review,
+        rating: req.body.rating,
+      },
+      { upsert: true }
+    ); // add validations
+    console.log("reviewText: " + req.body.reviewText);
+    return res.json("updated!");
+  },
+
   updateLikes: async (req, res) => {
     const reviewId = req.params.reviewId;
     const currentUserAuthDetails = res.locals.userAuth;
@@ -131,9 +141,7 @@ module.exports = {
     const currentUser = await User.findOne({ username: currentUserUsername });
 
     if (!currentUser) {
-      return res
-        .status(404)
-        .json({ error: `Username ${currentUserUsername} does not exist!` });
+      return res.status(404).json({ error: `Username ${currentUserUsername} does not exist!` });
     }
 
     try {
@@ -160,9 +168,7 @@ module.exports = {
       }
 
       if (!review) {
-        return res
-          .status(404)
-          .json({ error: `Review Id ${reviewId} does not exist!` });
+        return res.status(404).json({ error: `Review Id ${reviewId} does not exist!` });
       }
 
       return res.json(review);
@@ -181,18 +187,14 @@ module.exports = {
     const currentUser = await User.findOne({ username: currentUserUsername });
 
     if (!currentUser) {
-      return res
-        .status(404)
-        .json({ error: `Username ${currentUserUsername} does not exist!` });
+      return res.status(404).json({ error: `Username ${currentUserUsername} does not exist!` });
     }
 
     try {
       const review = await Review.findById(reviewId);
 
       if (!review) {
-        return res
-          .status(404)
-          .json({ error: `Review with Id ${reviewId} does not exist!` });
+        return res.status(404).json({ error: `Review with Id ${reviewId} does not exist!` });
       }
       const comment = await Comment.create({
         authorUserId: currentUser._id,

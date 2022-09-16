@@ -4,9 +4,12 @@ const reviewController = require("../controllers/review_controller");
 const router = express.Router();
 const authMiddleWare = require("../middleware/authmiddleware");
 
-// GET MOVIE DETAILS
+// Index movie metadata
 router.get("/listofgenres", movieController.listOfGenres);
 router.get("/:movieApiId", movieController.showMovie);
+
+// Index movies
+router.get("/search/:query", movieController.searchMovies);
 router.get("/:genre/:genreId", movieController.filterByGenre);
 
 module.exports = router;

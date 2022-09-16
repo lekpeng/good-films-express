@@ -9,6 +9,7 @@ router.post("/:movieApiId", authMiddleWare, reviewController.createReview);
 router.delete("/:reviewId/", authMiddleWare, reviewController.deleteReview);
 
 // Actions on reviews
+router.put("/:reviewId", authMiddleWare, reviewController.updateReview);
 router.patch("/:reviewId/like", authMiddleWare, reviewController.updateLikes);
 router.patch("/:reviewId/unlike", authMiddleWare, reviewController.updateLikes);
 router.post(
