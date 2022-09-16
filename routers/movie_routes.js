@@ -6,10 +6,10 @@ const authMiddleWare = require("../middleware/authmiddleware");
 
 // Index movie metadata
 router.get("/listofgenres", movieController.listOfGenres);
-router.get("/:movieApiId", movieController.showMovie);
 
 // Index movies
-router.get("/search/:query", movieController.searchMovies);
+router.get("/search/:query/:page", movieController.searchMovies);
+router.get("/:movieApiId", movieController.showMovie);
 router.get("/:genre/:genreId", movieController.filterByGenre);
 
 module.exports = router;

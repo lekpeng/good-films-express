@@ -4,7 +4,6 @@ const Movie = require("../models/movie");
 
 module.exports = {
   showMovie: async (req, res) => {
-    console.log("running show movie");
     try {
       const response = await axios.get(
         `https://api.themoviedb.org/3/movie/${req.params.movieApiId}?api_key=${process.env.API_KEY}`
@@ -42,15 +41,11 @@ module.exports = {
   searchMovies: async (req, res) => {
     try {
       const response = await axios.get(
-        `https://api.themoviedb.org/3/search/movie?api_key=${process.env.API_KEY}&query=${req.params.query}`
+        `https://api.themoviedb.org/3/search/movie?api_key=${process.env.API_KEY}&query=${req.params.query}&page=${req.params.page}`
       );
-      const data = response.data.results.map((movie) => {
-        return {
-          movieApiId: movie.id,
-          movieTitle: movie.title,
-          movieImage: movie.poster_path,
-        };
-      });
+
+      const data = await response.data;
+
       return res.json(data);
     } catch (err) {
       return res.status(500).json({ error: `${err}. Failed to get movie` });
