@@ -15,6 +15,17 @@ module.exports = {
     }
   },
 
+  showOurMovie: async (req, res) => {
+    const currentMovie = req.params.movieApiId;
+    const movie = await Movie.findOne({ movieApiId: currentMovie }).populate("reviewIds");
+
+    if (!movie) {
+      return res.json({});
+    } else {
+      return res.json(movie);
+    }
+  },
+
   listOfGenres: async (req, res) => {
     try {
       const response = await axios.get(

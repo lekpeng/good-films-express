@@ -11,14 +11,16 @@ const reviews = [
 
   {
     reviewText: "someone give me a time turner for xmas please",
+    rating: 0,
   },
 
   {
-    reviewText: "i miss snape",
-    reting: 10,
+    reviewText: "i miss cedric",
+    rating: 10,
   },
 
   {
+    reviewText: "",
     rating: 6,
   },
 
@@ -28,15 +30,18 @@ const reviews = [
   },
 
   {
+    reviewText: "",
     rating: 5,
   },
 
   {
+    reviewText: "",
     rating: 9,
   },
 
   {
     reviewText: "ron is the superior weasely",
+    rating: 0,
   },
 ];
 
