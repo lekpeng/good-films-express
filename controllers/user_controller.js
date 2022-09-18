@@ -9,12 +9,10 @@ module.exports = {
     const formData = userValidators.registerValidator.validate(req.body);
 
     if (formData.error) {
-      console.log("error: ", formData.error.message);
       return res.status(409).json({ error: formData.error.message });
     }
 
     const validatedValues = formData.value;
-    console.log("validated values: ", validatedValues);
 
     // checks for unique email and username
     try {
@@ -40,7 +38,6 @@ module.exports = {
     try {
       await userModel.create(user);
     } catch (err) {
-      console.log(err);
       return res.status(500).json({ error: "Failed to register user" });
     }
 

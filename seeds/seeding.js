@@ -76,8 +76,8 @@ const updateAverageRatings = async () => {
   const movies = await movieModel.find({}).populate("reviewIds");
   const moviesWithUpdatedAverage = await Promise.all(
     movies.map(async (movie) => {
-      const ratings = movie.reviewIds.map((review) => review.rating).filter(Boolean);
-      let averageRating = 0;
+      const ratings = movie.reviewIds.map((review) => review.rating).filter((rating) => rating > 0);
+      let averageRating = "None";
       if (ratings.length) {
         averageRating = ratings.reduce((a, b) => a + b) / ratings.length;
       }

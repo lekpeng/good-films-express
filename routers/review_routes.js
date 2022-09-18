@@ -18,10 +18,6 @@ router.delete("/:reviewId/", authMiddleWare, reviewController.deleteReview);
 router.put("/:reviewId", authMiddleWare, reviewController.updateReview);
 router.patch("/:reviewId/like", authMiddleWare, reviewController.updateLikes);
 router.patch("/:reviewId/unlike", authMiddleWare, reviewController.updateLikes);
-router.post(
-  "/:reviewId/comments",
-  authMiddleWare,
-  reviewController.createComment
-);
+router.post("/:reviewId/comments", authMiddleWare, reviewController.createComment);
 
 module.exports = router;
