@@ -17,7 +17,9 @@ module.exports = {
       .lean();
 
     if (!review) {
-      return res.status(404).json({ error: `Review with ID ${reviewId} does not exist!` });
+      return res
+        .status(404)
+        .json({ error: `Review with ID ${reviewId} does not exist!` });
     }
 
     try {
@@ -46,6 +48,7 @@ module.exports = {
     const movieExists = await Movie.findOne({
       movieApiId: movieReviewedId,
     }).populate("reviewIds");
+    console.log("MovieExists:", movieExists);
 
     // Function to create new review document and tag it to Movie and User
     const tagReview = async (newMovie) => {
@@ -56,11 +59,14 @@ module.exports = {
         rating: userRating,
       });
 
-      const numberOfVotes = movieExists.reviewIds.filter((reviewId) => reviewId.rating).length;
-      let updatedAverageRating = movieExists.averageRating;
+      const numberOfVotes = newMovie.reviewIds.filter(
+        (reviewId) => reviewId.rating
+      ).length;
+      let updatedAverageRating = newMovie.averageRating;
       if (userRating > 0) {
         updatedAverageRating =
-          (movieExists.averageRating * numberOfVotes + userRating) / (numberOfVotes + 1);
+          (newMovie.averageRating * numberOfVotes + userRating) /
+          (numberOfVotes + 1);
       }
 
       await Movie.findOneAndUpdate(
@@ -97,20 +103,27 @@ module.exports = {
     const currentUser = await User.findOne({ username: currentUserUsername });
     const review = await Review.findById(reviewId);
     if (!review) {
-      return res.status(404).json({ error: `Review with ID ${reviewId} does not exist` });
+      return res
+        .status(404)
+        .json({ error: `Review with ID ${reviewId} does not exist` });
     }
 
     if (review.authorUserId.toString() !== currentUser._id.toString()) {
-      return res.status(401).json({ error: "You are not authorized to delete this review" });
+      return res
+        .status(401)
+        .json({ error: "You are not authorized to delete this review" });
     }
 
     // pull reviewId from User and Movie, update movie average rating
     const movie = await Movie.findById(review.movieId).populate("reviewIds");
-    const numberOfVotes = movie.reviewIds.filter((reviewId) => reviewId.rating).length;
+    const numberOfVotes = movie.reviewIds.filter(
+      (reviewId) => reviewId.rating
+    ).length;
     let updatedAverageRating = movie.averageRating;
     if (review.rating > 0) {
       updatedAverageRating =
-        (movie.averageRating * numberOfVotes - review.rating) / (numberOfVotes - 1);
+        (movie.averageRating * numberOfVotes - review.rating) /
+        (numberOfVotes - 1);
     }
 
     await currentUser.updateOne({
@@ -140,8 +153,12 @@ module.exports = {
     const previousReview = await Review.findById(reviewId);
     const previousRating = previousReview.rating;
 
-    const movie = await Movie.findById(previousReview.movieId).populate("reviewIds");
-    const numberOfVotes = movie.reviewIds.filter((reviewId) => reviewId.rating > 0).length;
+    const movie = await Movie.findById(previousReview.movieId).populate(
+      "reviewIds"
+    );
+    const numberOfVotes = movie.reviewIds.filter(
+      (reviewId) => reviewId.rating > 0
+    ).length;
     console.log("number of votes", numberOfVotes);
     let updatedAverageRating = movie.averageRating;
 
@@ -151,14 +168,19 @@ module.exports = {
 
       if (previousRating === 0) {
         updatedAverageRating =
-          (movie.averageRating * numberOfVotes + updatedRating) / (numberOfVotes + 1);
+          (movie.averageRating * numberOfVotes + updatedRating) /
+          (numberOfVotes + 1);
       } else if (updatedRating === 0) {
         console.log("updated rating is 0");
         updatedAverageRating =
-          (movie.averageRating * numberOfVotes - previousRating) / (numberOfVotes - 1);
+          (movie.averageRating * numberOfVotes - previousRating) /
+          (numberOfVotes - 1);
       } else {
         updatedAverageRating =
-          (movie.averageRating * numberOfVotes + updatedRating - previousRating) / numberOfVotes;
+          (movie.averageRating * numberOfVotes +
+            updatedRating -
+            previousRating) /
+          numberOfVotes;
       }
     }
 
@@ -184,7 +206,9 @@ module.exports = {
     const currentUser = await User.findOne({ username: currentUserUsername });
 
     if (!currentUser) {
-      return res.status(404).json({ error: `Username ${currentUserUsername} does not exist!` });
+      return res
+        .status(404)
+        .json({ error: `Username ${currentUserUsername} does not exist!` });
     }
 
     try {
@@ -209,7 +233,9 @@ module.exports = {
       }
 
       if (!review) {
-        return res.status(404).json({ error: `Review Id ${reviewId} does not exist!` });
+        return res
+          .status(404)
+          .json({ error: `Review Id ${reviewId} does not exist!` });
       }
 
       return res.json(review);
@@ -228,14 +254,18 @@ module.exports = {
     const currentUser = await User.findOne({ username: currentUserUsername });
 
     if (!currentUser) {
-      return res.status(404).json({ error: `Username ${currentUserUsername} does not exist!` });
+      return res
+        .status(404)
+        .json({ error: `Username ${currentUserUsername} does not exist!` });
     }
 
     try {
       const review = await Review.findById(reviewId);
 
       if (!review) {
-        return res.status(404).json({ error: `Review with Id ${reviewId} does not exist!` });
+        return res
+          .status(404)
+          .json({ error: `Review with Id ${reviewId} does not exist!` });
       }
       const comment = await Comment.create({
         authorUserId: currentUser._id,

@@ -17,7 +17,9 @@ module.exports = {
 
   showOurMovie: async (req, res) => {
     const currentMovie = req.params.movieApiId;
-    const movie = await Movie.findOne({ movieApiId: currentMovie }).populate("reviewIds");
+    const movie = await Movie.findOne({ movieApiId: currentMovie }).populate(
+      "reviewIds"
+    );
 
     if (!movie) {
       return res.json({});
