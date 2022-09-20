@@ -43,7 +43,7 @@ module.exports = {
   filterByGenre: async (req, res) => {
     try {
       const response = await axios.get(
-        `https://api.themoviedb.org/3/discover/movie?with_genres=${req.params.genreId}&api_key=${process.env.API_KEY}`
+        `https://api.themoviedb.org/3/discover/movie?with_genres=${req.params.genreId}&api_key=${process.env.API_KEY}&page=${req.params.page}`
       );
       const data = await response.data;
       return res.json(data.results);
