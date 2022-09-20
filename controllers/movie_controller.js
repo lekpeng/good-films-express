@@ -10,16 +10,16 @@ module.exports = {
       );
       const data = await response.data;
       return res.json(data);
-    } catch (error) {
-      return res.status(500).json({ error: `Failed to get movie` });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ error: `${err}. Failed to get movie with API Id ${req.params.movieApiId}` });
     }
   },
 
   showOurMovie: async (req, res) => {
     const currentMovie = req.params.movieApiId;
-    const movie = await Movie.findOne({ movieApiId: currentMovie }).populate(
-      "reviewIds"
-    );
+    const movie = await Movie.findOne({ movieApiId: currentMovie }).populate("reviewIds");
 
     if (!movie) {
       return res.json({});
@@ -47,7 +47,7 @@ module.exports = {
       );
       const data = await response.data;
       return res.json(data.results);
-    } catch (error) {
+    } catch (err) {
       return res.status(404).json({ error: `Failed to get movie` });
     }
   },
