@@ -11,6 +11,6 @@ router.get("/listofgenres", movieController.listOfGenres);
 router.get("/search/:query/:page", movieController.searchMovies);
 router.get("/our-movies/:movieApiId", movieController.showOurMovie);
 router.get("/:movieApiId", movieController.showMovie);
-router.get("/:genre/:genreId", movieController.filterByGenre);
+router.get("/:genre/:genreId/:page", movieController.filterByGenre);
 
 module.exports = router;
