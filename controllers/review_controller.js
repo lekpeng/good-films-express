@@ -39,14 +39,12 @@ module.exports = {
     const currentUserUsername = currentUserAuthDetails.data.username;
     const movieReviewedId = req.params.movieApiId;
     const userRating = req.body.newRating;
-    console.log("user rating", userRating);
     const userReview = req.body.newReview.text;
 
     const currentUser = await User.findOne({ username: currentUserUsername });
     const movieExists = await Movie.findOne({
       movieApiId: movieReviewedId,
     }).populate("reviewIds");
-    console.log("MovieExists:", movieExists);
 
     // Function to create new review document and tag it to Movie and User
     const tagReview = async (newMovie) => {
